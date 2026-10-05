@@ -1,18 +1,34 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { Stack } from "expo-router";
+import { useEffect } from "react";
+import { COLORS } from "../constants/theme";
+import { initDatabase } from "../services/dbService";
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+export default function RootLayout() {
+  useEffect(() => {
+    try {
+      initDatabase();
+    } catch (e) {
+      console.error("Database init error:", e);
+    }
+  }, []);
 
-SplashScreen.preventAutoHideAsync();
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <Stack
+      screenOptions={{
+        headerStyle: { backgroundColor: COLORS.secondary },
+        headerTintColor: "#FFFFFF",
+        headerTitleStyle: { fontWeight: "700" },
+        contentStyle: { backgroundColor: COLORS.background },
+      }}
+    >
+      <Stack.Screen name="login" options={{ headerShown: false }} />
+      <Stack.Screen name="index" options={{ title: "H FINANCE" }} />
+      <Stack.Screen name="search" options={{ title: "ค้นหาหุ้น" }} />
+      <Stack.Screen
+        name="stock/[symbol]"
+        options={{ title: "รายละเอียดหุ้น" }}
+      />
+      <Stack.Screen name="portfolio" options={{ title: "พอร์ตจำลอง" }} />
+    </Stack>
   );
 }
